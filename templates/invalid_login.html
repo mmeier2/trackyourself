@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Track Yourself{% endblock %}
+{% block content %}
+
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+   <title> Login</title>
+   <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+   <style>
+      body {background-color:#FFF;}
+   </style>
+   <script>
+      function login() {
+         window.opener.mainform.userName.value=document.loginform.userN.value;
+         window.opener.mainform.passWord.value=document.loginform.userP.value;  
+         window.close();
+      }
+      function cancel() {window.close();}
+   </script>
+</head>
+<body>
+	<font size="3" color="red">Your login info was incorrect. Please enter valid login credentials</font>
+   <form name="loginform", method="post", action="login_auth/"> {% csrf_token %}
+      <p>Email : <input type="text" name="userN" size="25" onfocus="this.select();" /></p>
+      <p>Password : <input type="password" name="userP" size="25" onfocus="this.select();" /></p>
+      <p>
+         <input type="submit" name="select" value="Login" />
+         <input type="button" name="select" value="Cancel" onclick="cancel();" />
+      </p>
+   </form>
+</body>
+</html> {% endblock content %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Track Yourself{% endblock %}
+{% block content %}
+          <h1 align="center">Welcome to the Track Yourself app home page</h1>
+          <p align="center">Track Yourself is web based app that enables people to help lead a healthier life style. Track Yourself allows you to track various workouts and physiolocial data in a convienet web app. Sign up today!</p>
+
+
+<script>
+function login()
+  {
+  window.location= window.location+"Login.html";
+  }
+</script>
+
+<script>
+function register()
+  {
+  window.location= window.location+"register.html";
+  }
+</script>
+
+</head>
+<body>
+
+<p align="center">
+If you are a returning user, please login in below:
+</p>
+<p align="center">
+<input type="button" class="btn btn-default" name="login" value="Login" onclick="login()">
+</p>
+
+<p align="center">
+Otherwise, please register below:
+</p>
+
+<p align="center">
+<input type="button" class="btn btn-default" name="register" value="Register" onclick="register()">
+</p>
+
+<body>
+
+
+<!--
+<script>
+    function login_windowopener() {
+     var le=(screen.width/2)-300;
+     var to=(screen.height/2)-130;
+     controlWindow=window.open("Login.html","dataitem","toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=300,height=130,left="+le+",top="+to+",screenX=0,screenY=0'");
+  }
+   </script>
+
+<script>
+    function register_windowopener() {
+     var le=(screen.width/2)-300;
+     var to=(screen.height/2)-130;
+     controlWindow=window.open("register.html","dataitem","toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=300,height=130,left="+le+",top="+to+",screenX=0,screenY=0'");
+  }
+   </script> -->
+<!-- </head>
+<body>
+   <form name="mainform">
+      <p><input type="button" name="login" value="Login" onclick="windowopener();" /></p>
+      <p>Username <input type="text" name="userName"/></p>
+      <p>Password <input type="text" name="passWord" /></p>
+   </form>
+</body> -->
+
+<!---
+<button type="button" allign="center" onclick="">Click Me!</button>
+<section class="loginform cf">
+<form name="login" action="index_submit" method="get" accept-charset="utf-8">
+	<ul>
+		<li><label for="usermail">Email</label>
+		<input type="email" name="usermail" placeholder="yourname@email.com" required></li>
+		<li><label for="password">Password</label>
+		<input type="password" name="password" placeholder="password" required></li>
+		<li>
+		<input type="submit" value="Login"></li>
+	</ul>
+</form>
+</section> -->
+
+{% endblock content %}
+
+
