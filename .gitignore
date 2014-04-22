@@ -37,6 +37,9 @@ coverage.xml
 # Translations
 *.mo
 
+#specific files
+*/track_yourself/settings.py
+
 # Mr Developer
 .mr.developer.cfg
 .project
