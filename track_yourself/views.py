@@ -105,15 +105,20 @@ def access_denied(request):
     else:
         return redirect('/')
 
-def view_data_summary(request):   
+def view_data_summary(request):
+    if( str(request.POST.get('phys')) == 'on'):
+        view_phys_summary(request)
+    elif( str(request.POST.get('workout')) == 'on'):
+        view_workout_summary(request)
+
+def view_phys_summary(request):
     s_time = str(request.POST.get('Syear')) + '-'
     s_time = s_time + str(request.POST.get('Smonth')) + '-'
     s_time = s_time + str(request.POST.get('Sday')) + " 00:00:00" 
     e_time = str(request.POST.get('Eyear')) + '-'
     e_time = e_time + str(request.POST.get('Emonth')) + '-'
     e_time = e_time + str(request.POST.get('Eday')) + " 23:59:59"
-    user_ID = request.session['member_id']
-    print s_time, e_time
+    user_ID = request.session['member_id'] 
     phys_data = data_table.get_data_summary_between(s_time, e_time, user_ID)
     dates = phys_data[0]
     durations = phys_data[1]
@@ -129,5 +134,5 @@ def view_data_summary(request):
             description = "Fat Percentage"
         else:
             description = "Weight"
-        writer.writerow([date, description, duration])
+        writer.writerow([date, description, duration]) 
     return response
