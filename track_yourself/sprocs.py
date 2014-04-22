@@ -17,6 +17,8 @@ class user_table():
                     lname = lastName
                     email_id = emailId
                     user_ID = userId
+            cursor.close()
+            cnx.close()
         except mysql.connector.Error as err:
             pass
         return {'user_ID':user_ID, 'fname':fname, 'lname':lname, 'email_id':email_id}
@@ -55,12 +57,11 @@ class data_table():
         dates = descriptions = durations = []
         cnx = mysql.connector.connect(user='root', database=DB_NAME)
         cursor = cnx.cursor()
-        get_data = ("SELECT date, duration, descriptionType FROM Data WHERE duration (BETWEEN %s and %s) AND dataType=1 AND userId=%s")
+        get_data = ("SELECT date, duration, descriptionType FROM Data WHERE date >= %s AND date <= %s AND dataType=1 AND userId=%s")
         interval = (start, end, user_ID)
         try:
             print get_data, interval
             cursor.execute(get_data, interval)
-            cnx.commit()
             for (date, duration, descriptionType) in cursor:
                 if date is not None and duration is not None and descriptionType is not None:
                     dates.append(date)
@@ -70,4 +71,5 @@ class data_table():
             cnx.close()
         except mysql.connector.Error as err:
             print "Error trying to access data in Data table"
+            print err
         return [dates, durations, descriptions]

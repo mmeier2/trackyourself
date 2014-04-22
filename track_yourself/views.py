@@ -108,10 +108,10 @@ def access_denied(request):
 def view_data_summary(request):   
     s_time = str(request.POST.get('Syear')) + '-'
     s_time = s_time + str(request.POST.get('Smonth')) + '-'
-    s_time = s_time + str(request.POST.get('Sday')) + " 00:00:00.000" 
+    s_time = s_time + str(request.POST.get('Sday')) + " 00:00:00" 
     e_time = str(request.POST.get('Eyear')) + '-'
     e_time = e_time + str(request.POST.get('Emonth')) + '-'
-    e_time = e_time + str(request.POST.get('Eday')) + " 23:59:59.997"
+    e_time = e_time + str(request.POST.get('Eday')) + " 23:59:59"
     user_ID = request.session['member_id']
     print s_time, e_time
     phys_data = data_table.get_data_summary_between(s_time, e_time, user_ID)
