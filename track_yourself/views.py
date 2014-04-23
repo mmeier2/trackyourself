@@ -121,13 +121,31 @@ def view_phys_summary(request):
     e_time = e_time + str(request.POST.get('Emonth')) + '-'
     e_time = e_time + str(request.POST.get('Eday')) + " 23:59:59"
     user_ID = request.session['member_id'] 
-    phys_data = data_table.get_data_summary_between(s_time, e_time, user_ID)
+    phys_data = data_table.get_data_summary_between(s_time, e_time, 1, user_ID)
     dates = phys_data[0]
     durations = phys_data[1]
     descriptions = phys_data[2]
     print dates
 
     return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Phys', 'postData' : {"s_time": s_time, "e_time" : e_time}})
+
+def view_workout_summary(request):
+    s_time = str(request.POST.get('Syear')) + '-'
+    s_time = s_time + str(request.POST.get('Smonth')) + '-'
+    s_time = s_time + str(request.POST.get('Sday')) + " 00:00:00" 
+    e_time = str(request.POST.get('Eyear')) + '-'
+    e_time = e_time + str(request.POST.get('Emonth')) + '-'
+    e_time = e_time + str(request.POST.get('Eday')) + " 23:59:59"
+    user_ID = request.session['member_id'] 
+    phys_data = data_table.get_data_summary_between(s_time, e_time, 0, user_ID)
+    dates = phys_data[0]
+    durations = phys_data[1]
+    descriptions = phys_data[2]
+    print dates
+
+    return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Workout', 'postData' : {"s_time": s_time, "e_time" : e_time}})
+
+
 
 @csrf_exempt
 def create_csv(request):  
@@ -138,7 +156,11 @@ def create_csv(request):
         user_ID = request.session['member_id'] 
         s_time = request.POST['s_time']
         e_time = request.POST['e_time']
-        phys_data = data_table.get_data_summary_between(s_time, e_time, user_ID)
+        if request.POST['type'] == "Workout":
+            data_type = 0
+        else:
+            data_type = 1
+        phys_data = data_table.get_data_summary_between(s_time, e_time, data_type, user_ID)
         dates = phys_data[0]
         durations = phys_data[1]
         descriptions = phys_data[2]  

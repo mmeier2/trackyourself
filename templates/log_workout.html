@@ -54,6 +54,7 @@ $.ajaxSetup({
     {
     var duration = $("#meas").val();
     var type = $("#workType").find(":selected").val();
+    alert(type);
     $("#myModal").modal('hide')
     
       $.ajax({
@@ -91,9 +92,9 @@ $.ajaxSetup({
             <label>Workout Type</label>
             <div class="span5">
               <select id="workType">
-                  <option val="0">Running</option>
-                  <option val="1">Weight Lifting</option>
-                  <option val="2">Swimming</option>
+                  <option value="0">Running</option>
+                  <option value="1">Weight Lifting</option>
+                  <option value="2">Swimming</option>
                   <option>..</option>
               </select>
             </div>

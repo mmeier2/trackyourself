@@ -53,11 +53,11 @@ class user_table():
 
 class data_table():
     @staticmethod
-    def get_data_summary_between(start, end, user_ID):
+    def get_data_summary_between(start, end, data_type, user_ID):
         cnx = mysql.connector.connect(user='root', database=DB_NAME)
         cursor = cnx.cursor()
-        get_data = ("SELECT date, duration, descriptionType FROM Data WHERE date >= %s AND date <= %s AND dataType=1 AND userId=%s")
-        interval = (start, end, user_ID)
+        get_data = ("SELECT date, duration, descriptionType FROM Data WHERE date >= %s AND date <= %s AND dataType=%s AND userId=%s")
+        interval = (start, end, data_type, user_ID)
         try:
             print get_data, interval
             dates = []
