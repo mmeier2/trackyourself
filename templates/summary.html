@@ -1,0 +1,91 @@
+{% extends "user.html" %}
+
+{% block title %}View Summary{% endblock %}
+{% block content %}
+<head>
+
+	<script src="http://handsontable.com/lib/jquery.min.js"></script>
+<script src="http://handsontable.com/dist/jquery.handsontable.full.js"></script>
+<link rel="stylesheet" media="screen" href="http://handsontable.com/dist/jquery.handsontable.full.css">
+<link rel="stylesheet" media="screen" href="http://handsontable.com/demo/css/samples.css?20140401">
+<style>
+.row {
+	margin-top : 150px;
+}
+
+#example{
+	margin-left: 30%;
+}
+
+#downloadbtn{
+	margin-left: 40%;
+}
+</style>
+
+<script>
+
+$(document).ready(function () {
+
+	Phys = ["Heartrate", "Fat Percentage", "Weight"];
+	Work = ["Running", "Weight Lifting", "Swimming"];
+	var data = [];
+	data[0] = ["Date", "Duration" , "Description"];
+	var i=1;
+	j=0;
+
+
+	{% for date in dates %}
+		data[i] = [];
+	    data[i][j] = "{{date}}";
+	    //data[i].push("{{date}}");
+	    i++;
+	{% endfor %}
+
+	i=1;
+	j++;
+	{% for duration in durations %}
+		data[i][j]="{{duration}}";
+		i++;
+	{% endfor %}
+
+	i=1;
+	j++;
+	{% for description in descriptions %}
+			if ("{{type}}" == 'Workout')
+				data[i][j]= Work[parseInt("{{description}}")];
+			else
+				data[i][j] = Phys[parseInt("{{description}}")];
+		i++;
+	{% endfor %}	
+
+
+	$('#example').handsontable({
+	  data: data,
+	  minSpareRows: 0,
+	  colHeaders: true,
+	  contextMenu: true
+	});
+
+
+  function bindDumpButton() {
+      $('body').on('click', 'button[name=dump]', function () {
+        var dump = $(this).data('dump');
+        var $container = $(dump);
+        console.log('data of ' + dump, $container.handsontable('getData'));
+      });
+    }
+  bindDumpButton();
+
+});
+
+</script>
+</head>
+<body>
+<div id="example" class="handsontable"></div>
+  <form class="form-horizontal" role="form" name="viewsumform" method="post" action="/create_csv/">{% csrf_token %}
+	<input type ="hidden" name = "s_time" value = "{{postData.s_time}}">
+	<input type ="hidden" name = "e_time" value = "{{postData.e_time}}">
+	<button id="downloadbtn" type = "submit" class= "btn btn-primary" name="summary">Download Summary</button>
+	</form>
+</body>
+{% endblock %}

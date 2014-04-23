@@ -1,6 +1,6 @@
 
 from django.conf.urls import patterns, include, url
-from track_yourself.views import home, Login, register, login_auth, log_phys_data, log_workout, view_summary, register_auth, user_home, access_denied, logout, invalid_login, add_data, view_data_summary
+from track_yourself.views import home, Login, register, login_auth, log_phys_data, log_workout, view_summary, register_auth, user_home, access_denied, logout, invalid_login, add_data, view_data_summary, create_csv
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf import settings
 from django.contrib import admin
@@ -35,7 +35,8 @@ urlpatterns = patterns('',
     url(r'^invalid_login/$'               ,invalid_login),
     url(r'^invalid_login/login_auth/$'               ,login_auth),
     url(r'^add_data/$'                          ,add_data), 
-    url(r'^view_data_summary/$'             ,view_data_summary),  
+    url(r'^view_data_summary/$'             ,view_data_summary),
+    url(r'^create_csv/$'             ,create_csv),  
 )
 
 

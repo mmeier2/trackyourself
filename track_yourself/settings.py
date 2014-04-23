@@ -84,7 +84,7 @@ DATABASES = {
 
 
 TEMPLATE_DIRS = (
-   '/Users/Dorel/Dropbox/Spring2014/CSE360/PROJECT/track_yourself/templates',
+   '/Users/Dorel/Dropbox/Spring2014/CSE360/PROJECT/git-trackyourself/trackyourself/templates',
    # '/users/kdrahbar/merucrial/track_yourself/templates',
    # '/users/kdrahbar/merucrial/track_yourself/templates',
 )
@@ -109,7 +109,7 @@ STATIC_URL = '/static/'
 
 # Bootstrap stuff
 STATICFILES_DIRS = (
-    '/Users/Dorel/Dropbox/Spring2014/CSE360/PROJECT/track_yourself/static',
+    '/Users/Dorel/Dropbox/Spring2014/CSE360/PROJECT/git-trackyourself/trackyourself/static',
    #'/users/kdrahbar/merucrial/track_yourself/static',
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.

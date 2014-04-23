@@ -1,11 +1,13 @@
 import csv
 import mysql.connector
 from django.shortcuts import render
+from django.shortcuts import render_to_response
 from django.shortcuts import redirect
 import time
 from django.http import HttpResponse
 from django.template import Template
 from sprocs import user_table, data_table
+from django.views.decorators.csrf import csrf_exempt
 
 DB_NAME = 'SE_Database_Schema'
 
@@ -107,9 +109,9 @@ def access_denied(request):
 
 def view_data_summary(request):
     if( str(request.POST.get('phys')) == 'on'):
-        view_phys_summary(request)
+        return view_phys_summary(request)
     elif( str(request.POST.get('workout')) == 'on'):
-        view_workout_summary(request)
+        return view_workout_summary(request)
 
 def view_phys_summary(request):
     s_time = str(request.POST.get('Syear')) + '-'
@@ -123,16 +125,33 @@ def view_phys_summary(request):
     dates = phys_data[0]
     durations = phys_data[1]
     descriptions = phys_data[2]
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="file.csv"'
-    writer = csv.writer(response)
-    writer.writerow(["Date", "Data Type", "Measurement"])
-    for (date, duration, description) in zip(dates, durations, descriptions):
-        if description == '0':
-            description = "Heartrate"
-        elif description == '1':
-            description = "Fat Percentage"
-        else:
-            description = "Weight"
-        writer.writerow([date, description, duration]) 
-    return response
+    print dates
+
+    return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Phys', 'postData' : {"s_time": s_time, "e_time" : e_time}})
+
+@csrf_exempt
+def create_csv(request):  
+    if request.POST:
+        dates = []
+        durations = []
+        descriptions = []
+        user_ID = request.session['member_id'] 
+        s_time = request.POST['s_time']
+        e_time = request.POST['e_time']
+        phys_data = data_table.get_data_summary_between(s_time, e_time, user_ID)
+        dates = phys_data[0]
+        durations = phys_data[1]
+        descriptions = phys_data[2]  
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="summary.csv"'
+        writer = csv.writer(response)
+        writer.writerow(["Date", "Data Type", "Measurement"])
+        for (date, duration, description) in zip(dates, durations, descriptions):
+            if description == 0:
+                description = "Heartrate"
+            elif description == 1:
+                description = "Fat Percentage"
+            else:
+                description = "Weight"
+            writer.writerow([date, description, duration]) 
+        return response
