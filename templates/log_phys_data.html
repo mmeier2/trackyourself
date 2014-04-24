@@ -54,25 +54,30 @@ $.ajaxSetup({
     function addData()
     {
     var duration = $("#meas").val();
-    var type = $("#physType").find(":selected").val();
-    $("#myModal").modal('hide')
-    
-      $.ajax({
-     type:"POST",
-     url:"/add_data/",
-     data: {
-            'data_type': "1", //for phys data
-            'duration': duration, // from form
-            'type': type 
-            // all of this data is submitted via POST to your view.
-            // in django, request.POST['background-color'] 
+     if(duration == 0)
+      alert("Please input a Measurement");
+    else
+    {
+      var type = $("#physType").find(":selected").val();
+      $("#myModal").modal('hide')
+      
+        $.ajax({
+       type:"POST",
+       url:"/add_data/",
+       data: {
+              'data_type': "1", //for phys data
+              'duration': duration, // from form
+              'type': type 
+              // all of this data is submitted via POST to your view.
+              // in django, request.POST['background-color'] 
+          },
+        success: function () {
+          alert("Your Data has been added")
         },
-      success: function () {
-        alert("Your Data has been added")
-      },
-      error: function () {
-        alert("There was an issue adding your data. Please try again")}
-    });
+        error: function () {
+          alert("There was an issue adding your data. Please try again")}
+      });
+      }
     }
   </script>
 </head>
@@ -80,7 +85,7 @@ $.ajaxSetup({
           <h1 align="center">Log Physiological Data</h1>
           <p>Welcome back, if you would like to log Physiological data, please click below:</p>
 
- <a data-toggle="modal" href="#myModal" class="btn btn-primary btn-lg">Log Physiological Data</a>
+ <a data-toggle="modal" href="#myModal" class="btn btn-primary btn-lg text-center">Log Physiological Data</a>
 
   <!-- Modal -->
   <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -98,7 +103,6 @@ $.ajaxSetup({
                   <option selected="selected" value="0">Heartrate</option>
                   <option value="1">Fat Percentage</option>
                   <option value="2">Weight</option>
-                  <option>..</option>
                 </select>
               <input class ="col-md-2 col-md-offset-1" id="meas" placeholder="Meas."  type="number">
               </input>

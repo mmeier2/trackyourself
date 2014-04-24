@@ -125,9 +125,12 @@ def view_phys_summary(request):
     dates = phys_data[0]
     durations = phys_data[1]
     descriptions = phys_data[2]
+    start = str(request.POST.get('Smonth')) + '/' + str(request.POST.get('Sday')) + '/' + str(request.POST.get('Syear'))
+    end = str(request.POST.get('Emonth')) + '/' + str(request.POST.get('Eday')) + '/' + str(request.POST.get('Eyear'))
+    
     print dates
 
-    return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Phys', 'postData' : {"s_time": s_time, "e_time" : e_time}})
+    return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Phys', 'postData' : {"s_time": start, "e_time" : end}})
 
 def view_workout_summary(request):
     s_time = str(request.POST.get('Syear')) + '-'
@@ -141,15 +144,19 @@ def view_workout_summary(request):
     dates = phys_data[0]
     durations = phys_data[1]
     descriptions = phys_data[2]
+    start = str(request.POST.get('Smonth')) + '/' + str(request.POST.get('Sday')) + '/' + str(request.POST.get('Syear'))
+    end = str(request.POST.get('Emonth')) + '/' + str(request.POST.get('Eday')) + '/' + str(request.POST.get('Eyear'))
     print dates
 
-    return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Workout', 'postData' : {"s_time": s_time, "e_time" : e_time}})
+    return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Workout', 'postData' : {"s_time": start, "e_time" : end}})
 
 
 
 @csrf_exempt
 def create_csv(request):  
     if request.POST:
+        Phys = ["Heartrate", "Fat Percentage", "Weight"]
+        Work = ["Running", "Weight Lifting", "Swimming"]
         dates = []
         durations = []
         descriptions = []
@@ -169,11 +176,9 @@ def create_csv(request):
         writer = csv.writer(response)
         writer.writerow(["Date", "Data Type", "Measurement"])
         for (date, duration, description) in zip(dates, durations, descriptions):
-            if description == 0:
-                description = "Heartrate"
-            elif description == 1:
-                description = "Fat Percentage"
+            if data_type == 0:
+                description = Work[int(description)]
             else:
-                description = "Weight"
+                description = Phys[int(description)]
             writer.writerow([date, description, duration]) 
         return response

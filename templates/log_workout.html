@@ -53,23 +53,27 @@ $.ajaxSetup({
     function addData()
     {
     var duration = $("#meas").val();
-    var type = $("#workType").find(":selected").val();
-    alert(type);
-    $("#myModal").modal('hide')
-    
-      $.ajax({
-     type:"POST",
-     url:"/add_data/",
-     data: {
-            'data_type': "0", //for workout data
-            'duration': duration, // from form
-            'type': type 
-            // all of this data is submitted via POST to your view.
-            // in django, request.POST['background-color'] 
-        },
-      success:
-        alert("Your Data has been added")
-    });
+    if(duration == 0)
+      alert("Please input a duration");
+    else
+      {
+      var type = $("#workType").find(":selected").val();
+      $("#myModal").modal('hide')
+      
+        $.ajax({
+       type:"POST",
+       url:"/add_data/",
+       data: {
+              'data_type': "0", //for workout data
+              'duration': duration, // from form
+              'type': type 
+              // all of this data is submitted via POST to your view.
+              // in django, request.POST['background-color'] 
+          },
+        success:
+          alert("Your Data has been added")
+      });
+      }
     }
   </script>
 </head>
@@ -95,7 +99,6 @@ $.ajaxSetup({
                   <option value="0">Running</option>
                   <option value="1">Weight Lifting</option>
                   <option value="2">Swimming</option>
-                  <option>..</option>
               </select>
             </div>
             <br/>

@@ -14,11 +14,19 @@
 }
 
 #example{
-	margin-left: 30%;
+	margin-left: 35%;
 }
 
 #downloadbtn{
-	margin-left: 40%;
+	margin-left: 43%;
+}
+
+h2{
+	text-align: center;
+}
+
+#startend {
+	text-align: center;
 }
 </style>
 
@@ -81,6 +89,12 @@ $(document).ready(function () {
 </script>
 </head>
 <body>
+	{% if type == 'Workout' %}
+	<h2> Workout Summary</h2>
+	{% else %}
+	<h2> Physiological Data Summary</h2>
+	{% endif %}
+<p id="startend">{{postData.s_time}} - {{postData.e_time}}</p>
 <div id="example" class="handsontable"></div>
   <form class="form-horizontal" role="form" name="viewsumform" method="post" action="/create_csv/">{% csrf_token %}
 	<input type ="hidden" name = "s_time" value = "{{postData.s_time}}">
