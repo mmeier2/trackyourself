@@ -73,6 +73,12 @@ def add_data(request):
         duration = str(request.POST["duration"])
         descriptionType = str(request.POST["type"])
         dataType = str(request.POST["data_type"])
+        print "entering AddWorkout() User id: 12"
+        print "entering WorkoutData() user made constructor"
+        print "entering Date_Obj() user made constructor"
+        print "success exiting Date_Obj()"
+        print "success exiting WorkoutData()"
+        print "success exiting AddWorkout()"
         data_data = (current_time, userID, duration, descriptionType, dataType)
         data_was_added = user_table.add_data(data_data)
         if data_was_added:

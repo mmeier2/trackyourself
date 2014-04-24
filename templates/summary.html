@@ -9,12 +9,12 @@
 <link rel="stylesheet" media="screen" href="http://handsontable.com/dist/jquery.handsontable.full.css">
 <link rel="stylesheet" media="screen" href="http://handsontable.com/demo/css/samples.css?20140401">
 <style>
-.row {
+#main-row {
 	margin-top : 150px;
 }
 
-#example{
-	margin-left: 35%;
+#example {
+	margin-left:20%;
 }
 
 #downloadbtn{
@@ -86,7 +86,206 @@ $(document).ready(function () {
 
 });
 
+function count_workout_data()
+{
+	
+	var workouts= [0,0,0]
+	{% for description in descriptions %}
+		workouts[parseInt("{{description}}")] += 1
+	{% endfor %}
+	return workouts;
+}
+
+function count_workouts()
+{
+	var workouts = [];
+	{% for description in descriptions %}
+		workouts.push(parseInt("{{description}}"));
+	{% endfor %}
+	return workouts;
+}
+
+function count_durations()
+{
+	var durations = [];
+	{% for duration in durations %}
+		durations.push(parseInt("{{duration}}"));
+	{% endfor %}
+	return durations;
+}
+
+// Jquery on the dropdown menu to call corresponding funciton
+$(document).ready(function(){$("#graphOption").change(function(){
+	var option_selected = $("#graphOption option:selected").val();
+	if(option_selected === "barGraph")
+		create_barGraph();
+	else if(option_selected === "avgGraph")
+		create_avgGraph();
+	else if(option_selected == "pieChart")
+		create_pieChart();
+
+})});
+
+function create_barGraph(){
+	var workouts = count_workout_data();
+	var labels;
+	var name;
+	if ("{{type}}" == 'Workout')
+	{
+		labels = ["Running", "Weight Lifting", "Swimming"];
+		name = "Count of Each Workout Type";
+	}
+	else
+	{	
+		labels = ["Heartrate", "Fat Percentage", "Weight"];
+		name = "Count of Each Data Type Entered";
+	}
+	var chart = new CanvasJS.Chart("chartContainer", {
+
+      theme: "theme2",
+            
+      title:{
+        text: name              
+      },
+
+      data: [  //array of dataSeries     
+      { //dataSeries - first quarter
+ 		/*** Change type "column" to "bar", "area", "line" or "pie"***/        
+       type: "column",
+       dataPoints: [
+       { label: labels[0], y: workouts[0] },
+       { label: labels[1], y: workouts[1] },
+       { label: labels[2], y: workouts[2] }                                   
+       ]
+     },
+     
+    ],
+  });
+	chart.render();
+}
+
+function create_avgGraph()
+{
+	var duration_sums = [0,0,0];
+	var labels;
+	var name;
+	// Count average durations
+	if ("{{type}}" == 'Workout')
+	{
+		labels = ["Running", "Weight Lifting", "Swimming"];
+		name = "Average Duration of Each Workout Type";
+	}
+	// Count average readings
+	else
+	{	
+		labels = ["Heartrate", "Fat Percentage", "Weight"];
+		name = "Average Measurement for Each Data Type";
+	}
+	var workouts = count_workouts(); 
+	var durations = count_durations();
+	var divisors = count_workout_data();
+	for(var i = 0; i < workouts.length; i++ )
+	{
+		duration_sums[workouts[i]] += durations[i];
+	}
+	for(var i = 0; i < 3; i++)
+	{
+		if (divisors[i] == 0)
+			duration_sums[i] = 0;
+		else
+			duration_sums[i] = duration_sums[i]/divisors[i];
+	}	
+	var chart = new CanvasJS.Chart("chartContainer", {
+
+      theme: "theme2",
+            
+      title:{
+        text: name              
+      },
+
+      data: [  //array of dataSeries     
+      { //dataSeries - first quarter
+ 		/*** Change type "column" to "bar", "area", "line" or "pie"***/        
+       type: "column",
+       dataPoints: [
+       { label: labels[0], y: duration_sums[0] },
+       { label: labels[1], y: duration_sums[1] },
+       { label: labels[2], y: duration_sums[2] }                                   
+       ]
+     },
+     
+    ],
+  });
+	chart.render();
+}
+
+function create_pieChart()
+{
+	var labels;
+	var name;
+	// Count average durations
+	if ("{{type}}" == 'Workout')
+	{
+		labels = ["Running", "Weight Lifting", "Swimming"];
+		name = "Distribution of Workouts";
+	}
+	// Count average readings
+	else
+	{	
+		labels = ["Heartrate", "Fat Percentage", "Weight"];
+		name = "Distribution of Data Types Entered";
+	}	
+	var divisors = count_workout_data();
+	var sum = divisors[0] + divisors[1] + divisors[2];  
+	var averages = []
+	for(var i =0; i < 3; i++)
+	{
+		if(divisors[i] == 0)
+			averages.push(0);
+		else
+			averages.push(divisors[i]/sum);
+	}
+	var chart = new CanvasJS.Chart("chartContainer",
+		{
+			title:{
+				text: name,
+				fontFamily: "arial black"
+
+			},
+			legend: {
+				verticalAlign: "bottom",
+				horizontalAlign: "center"
+			},
+			toolTip:{
+				enabled: true
+			},
+			theme: "theme1",
+			data: [
+			{        
+				type: "pie",
+				indexLabelFontFamily: "Garamond",       
+				indexLabelFontSize: 20,
+				indexLabelFontWeight: "bold",
+				startAngle:0,
+				indexLabelFontColor: "MistyRose",       
+				indexLabelLineColor: "darkgrey", 
+				indexLabelPlacement: "inside", 
+				toolTipContent: "{name}: {y}hrs",
+				showInLegend: true,
+				dataPoints: [
+				{  y: averages[0], name: labels[0], legendMarkerType: "triangle"},
+				{  y: averages[1], name: labels[1], legendMarkerType: "square"},
+				{  y: averages[2], name: labels[2], legendMarkerType: "circle"}
+				
+				]
+			}
+			]
+		});
+		chart.render();
+}
+
 </script>
+<script type="text/javascript" src="/static/bare/js/canvasjs-1.4.0/canvasjs.min.js"></script>
 </head>
 <body>
 	{% if type == 'Workout' %}
@@ -95,12 +294,24 @@ $(document).ready(function () {
 	<h2> Physiological Data Summary</h2>
 	{% endif %}
 <p id="startend">{{postData.s_time}} - {{postData.e_time}}</p>
-<div id="example" class="handsontable"></div>
+<div class = "row">
+	<div class="col-md-6"><div id="example" class="handsontable"></div></div>
+	<div class="col-md-6">  
+	<select id="graphOption">
+	<option selected="Make a Graph" disabled="disabled">Make a Graph</option>
+  <option value="barGraph">Bar Graph</option>
+  <option value="avgGraph">Bar Graph of Average Values</option>
+  <option value="pieChart">Pie Chart of Distribution</option>
+</select>
+<div id="chartContainer" style="height: 300px; width: 400px;"></div></div>
+</div>
+
   <form class="form-horizontal" role="form" name="viewsumform" method="post" action="/create_csv/">{% csrf_token %}
 	<input type ="hidden" name = "s_time" value = "{{postData.s_time}}">
 	<input type ="hidden" name = "e_time" value = "{{postData.e_time}}">
 	<input type ="hidden" name = "type" value = "{{type}}">
 	<button id="downloadbtn" type = "submit" class= "btn btn-primary" name="summary">Download Summary</button>
 	</form>
+	
 </body>
 {% endblock %}

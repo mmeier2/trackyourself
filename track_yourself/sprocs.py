@@ -59,7 +59,6 @@ class data_table():
         get_data = ("SELECT date, duration, descriptionType FROM Data WHERE date >= %s AND date <= %s AND dataType=%s AND userId=%s")
         interval = (start, end, data_type, user_ID)
         try:
-            print get_data, interval
             dates = []
             durations = []
             descriptions = []
