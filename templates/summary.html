@@ -31,7 +31,7 @@ h2{
 </style>
 
 <script>
-
+// Display the data between the ranges selected by the user in a table format
 $(document).ready(function () {
 
 	Phys = ["Heartrate", "Fat Percentage", "Weight"];
@@ -74,7 +74,7 @@ $(document).ready(function () {
 	  contextMenu: true
 	});
 
-
+  // bind the button to the data table
   function bindDumpButton() {
       $('body').on('click', 'button[name=dump]', function () {
         var dump = $(this).data('dump');
@@ -86,6 +86,7 @@ $(document).ready(function () {
 
 });
 
+// Returns a list of all of the workout types in order
 function count_workout_data()
 {
 	
@@ -96,6 +97,7 @@ function count_workout_data()
 	return workouts;
 }
 
+// Returns a count of each type of workout
 function count_workouts()
 {
 	var workouts = [];
@@ -105,6 +107,7 @@ function count_workouts()
 	return workouts;
 }
 
+// Returns a count of total duration times
 function count_durations()
 {
 	var durations = [];
@@ -126,6 +129,7 @@ $(document).ready(function(){$("#graphOption").change(function(){
 
 })});
 
+// Function to create bar graph when user selects it
 function create_barGraph(){
 	var workouts = count_workout_data();
 	var labels;
@@ -164,6 +168,7 @@ function create_barGraph(){
 	chart.render();
 }
 
+// Function to create and populate a bar graph with average duration times per workout type
 function create_avgGraph()
 {
 	var duration_sums = [0,0,0];
@@ -219,6 +224,7 @@ function create_avgGraph()
 	chart.render();
 }
 
+// Creates piechart showing distribution of data
 function create_pieChart()
 {
 	var labels;

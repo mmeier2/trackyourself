@@ -189,8 +189,7 @@ def view_workout_summary(request):
 
     return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Workout', 'postData' : {"s_time": start, "e_time" : end}})
 
-
-
+# This funciton creates a csv out of the data in the summary being viewed by the user
 @csrf_exempt
 def create_csv(request):  
     if request.POST:
