@@ -136,16 +136,6 @@ def access_denied(request):
 
 # Depending on the dype of summary the user wants to see, send them to the appropriate router
 def view_data_summary(request):
-    print "entering register()"
-    print "entering getDate()"
-    print "success exiting getDate()"
-    print "entering getDay()"
-    print "success exiting getDay()"
-    print "entering getMonth()"
-    print "success exiting getMonth()"
-    print "entering getYear()"
-    print "success exiting getYear()"
-    print "success exiting retrieveAllPhys()"
     if( str(request.POST.get('phys')) == 'on'):
         return view_phys_summary(request)
     elif( str(request.POST.get('workout')) == 'on'):

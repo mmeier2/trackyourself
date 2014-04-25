@@ -105,7 +105,7 @@ class User():
 	def setEmail(self, email):
 		self.email = email
 
-	def setFistName(self, firstName):
+	def setFirstName(self, firstName):
 		self.firstName = firstName
 
 	def setLastName(self, lastName):
