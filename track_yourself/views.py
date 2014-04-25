@@ -8,32 +8,47 @@ from django.http import HttpResponse
 from django.template import Template
 from sprocs import user_table, data_table
 from django.views.decorators.csrf import csrf_exempt
+from classes import Data, PhysData, WorkoutData, User, Month, Date_Obj
 
+# set the database name for connection
 DB_NAME = 'SE_Database_Schema'
 
+# keep track of the user that is currently using the system
+current_user = User('','','','',[],[])
+
+# route a user depending on whether or not they are logged in
 def home(request):
     if 'member_id' in request.session:
         return render(request, 'user_home.html')
     else:
+        current_user.setFirstName('')
+        current_user.setLastName('')
         return render(request, 'bare.html')
 
 def Login(request):
     return render(request, 'Login.html')
 
+# If the login credentials are invalid, send the user to invalid login page
 def invalid_login(request):
     return render(request, "invalid_login.html")
 
+# Route logged in user to logged in home page
 def user_home(request):
     if 'member_id' in request.session:
         return render(request, 'user_home.html')
     else:
         return render(request, 'bare.html')
 
+# Clear user credentials upon logout
 def logout(request):
     if 'member_id' in request.session:
         del request.session['member_id']
+        current_user.setFirstName('')
+        current_user.setLastName('')
+        current_user.setEmail('')
     return redirect('/')
 
+# Query the database for users credentials and route them accordingly
 def login_auth(request):
     user_cred = {}
     if request.POST:
@@ -42,16 +57,21 @@ def login_auth(request):
         user_cred = user_table.get_user(email, password)
         if user_cred['fname'] is not None:
             request.session['member_id'] = user_cred['user_ID']
+            current_user.setEmail(email)
             return redirect('/user_home/')
         else:
             return redirect('/invalid_login/')
 
+# Enter users credintials into database and keep their credentials
 def register_auth(request):
     if request.POST:
         email = request.POST.get('userN')
         password = request.POST.get('userP')
         fname = request.POST.get('userFN')
         lname = request.POST.get('userLN')
+        current_user.setEmail(email)
+        current_user.setFirstName(fname)
+        current_user.setLastName(lname)
 
         # Add the user
         # Returns a boolean regarding whether the add was succesful or not
@@ -65,6 +85,7 @@ def register_auth(request):
     else:
         return redirect('home')
 
+# Insert user data into the database and append it to the current user object
 def add_data(request):
     if request.POST:
         add_data = ("INSERT INTO Data (date, userId, duration, descriptionType, dataType) VALUES (%s, %s, %s, %s, %s)")
@@ -73,12 +94,6 @@ def add_data(request):
         duration = str(request.POST["duration"])
         descriptionType = str(request.POST["type"])
         dataType = str(request.POST["data_type"])
-        print "entering AddWorkout() User id: 12"
-        print "entering WorkoutData() user made constructor"
-        print "entering Date_Obj() user made constructor"
-        print "success exiting Date_Obj()"
-        print "success exiting WorkoutData()"
-        print "success exiting AddWorkout()"
         data_data = (current_time, userID, duration, descriptionType, dataType)
         data_was_added = user_table.add_data(data_data)
         if data_was_added:
@@ -86,39 +101,57 @@ def add_data(request):
         else:
             return HttpResponse(status=500)
 
+# route user to register page
 def register(request):
     return render(request, 'register.html')
 
+# If a user is logged in, send them to the log phys data page
 def log_phys_data(request):
     if 'member_id' in request.session:
         return render(request, 'log_phys_data.html')
     else:
         return redirect('/')
 
+# If a user is logged in, route them to the log a workout page
 def log_workout(request):
     if 'member_id' in request.session:
        return render(request, 'log_workout.html')
     else:
         return redirect('/')
 
+# If a user is logged in, send them to the view summary page
 def view_summary(request):
     if 'member_id' in request.session:
        return render(request, 'view_summary.html')
     else:
         return redirect('/')
 
+# If a user's credentials entered upon login are not vaid, send them
+# to the access denied page
 def access_denied(request):
     if 'member_id' in request.session:
        return render('access_denied.html')
     else:
         return redirect('/')
 
+# Depending on the dype of summary the user wants to see, send them to the appropriate router
 def view_data_summary(request):
+    print "entering register()"
+    print "entering getDate()"
+    print "success exiting getDate()"
+    print "entering getDay()"
+    print "success exiting getDay()"
+    print "entering getMonth()"
+    print "success exiting getMonth()"
+    print "entering getYear()"
+    print "success exiting getYear()"
+    print "success exiting retrieveAllPhys()"
     if( str(request.POST.get('phys')) == 'on'):
         return view_phys_summary(request)
     elif( str(request.POST.get('workout')) == 'on'):
         return view_workout_summary(request)
 
+# Query the database for the data requested by the user for physical data
 def view_phys_summary(request):
     s_time = str(request.POST.get('Syear')) + '-'
     s_time = s_time + str(request.POST.get('Smonth')) + '-'
