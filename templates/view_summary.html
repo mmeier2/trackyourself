@@ -4,6 +4,21 @@
 {% block content %}
 <head>
   <script type="text/javascript">
+
+  function valid_input(input)
+  {
+    var check = parseInt(input)
+    if (isNaN(check))
+      return false;
+    else
+      return true;
+  }
+
+  function invalid_input(input)
+  {
+    alert("You have entered an invalid input. Please only enter integers");
+    return false;
+  }
 $(document).ready(function () {
       $('#viewSumm').submit(function()
     {
@@ -13,6 +28,10 @@ $(document).ready(function () {
         var Eyear= $("input[name='Eyear']").val();
         var Emonth = $("input[name='Emonth']").val();
         var Eday = $("input[name='Eday']").val();
+
+        if (!(valid_input(Syear) && valid_input(Smonth) && valid_input(Sday) && valid_input(Eyear) && valid_input(Emonth) && valid_input(Eday)))
+          return invalid_input();
+
 
         var checked = $("input[name='workout']:checked").size() + $("input[name='phys']:checked").size();
 
