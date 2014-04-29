@@ -71,6 +71,8 @@ class data_table():
         cursor = cnx.cursor()
         get_data = ("SELECT date, duration, descriptionType FROM Data WHERE date >= %s AND date <= %s AND dataType=%s AND userId=%s")
         interval = (start, end, data_type, user_ID)
+        print get_data
+        print interval
         try:
             dates = []
             durations = []
@@ -82,6 +84,7 @@ class data_table():
             cursor.execute(get_data, interval)
             for (date, duration, descriptionType) in cursor:
                 if date is not None and duration is not None and descriptionType is not None:
+                    print date
                     dates.append(date)
                     durations.append(duration)
                     descriptions.append(descriptionType)

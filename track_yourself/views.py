@@ -159,7 +159,7 @@ def view_phys_summary(request):
     
     print dates
 
-    return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Phys', 'postData' : {"s_time": start, "e_time" : end}})
+    return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Phys', 'postData' : {"s_time": start, "e_time" : end, "sTime" : s_time, "eTime" : e_time}})
 
 def view_workout_summary(request):
     s_time = str(request.POST.get('Syear')) + '-'
@@ -177,7 +177,7 @@ def view_workout_summary(request):
     end = str(request.POST.get('Emonth')) + '/' + str(request.POST.get('Eday')) + '/' + str(request.POST.get('Eyear'))
     print dates
 
-    return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Workout', 'postData' : {"s_time": start, "e_time" : end}})
+    return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Workout', 'postData' : {"s_time": start, "e_time" : end, "sTime" : s_time, "eTime" : e_time}})
 
 # This funciton creates a csv out of the data in the summary being viewed by the user
 @csrf_exempt
@@ -199,6 +199,7 @@ def create_csv(request):
         dates = phys_data[0]
         durations = phys_data[1]
         descriptions = phys_data[2]  
+        print phys_data
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="summary.csv"'
         writer = csv.writer(response)

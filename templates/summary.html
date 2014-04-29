@@ -313,8 +313,8 @@ function create_pieChart()
 </div>
 
   <form class="form-horizontal" role="form" name="viewsumform" method="post" action="/create_csv/">{% csrf_token %}
-	<input type ="hidden" name = "s_time" value = "{{postData.s_time}}">
-	<input type ="hidden" name = "e_time" value = "{{postData.e_time}}">
+	<input type ="hidden" name = "s_time" value = "{{postData.sTime}}">
+	<input type ="hidden" name = "e_time" value = "{{postData.eTime}}">
 	<input type ="hidden" name = "type" value = "{{type}}">
 	<button id="downloadbtn" type = "submit" class= "btn btn-primary" name="summary">Download Summary</button>
 	</form>
