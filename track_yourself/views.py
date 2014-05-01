@@ -286,6 +286,7 @@ def email_doc(request):
         for date, duration, descrip in zip(dates, durations, descriptions):
             csvwriter.writerow([date, types[descrip], duration])
 
+
         recipient  = doctor_info['email']
         email_subject = "Health Tracker Data"
         content = "Hi Dr. %s, \n "
@@ -296,7 +297,7 @@ def email_doc(request):
 
         message.attach('invoice.csv', csvfile.getvalue(), 'text/csv')
         message.send()
-        
+
         return HttpResponse(status=200)
 
     else:
