@@ -1,0 +1,185 @@
+{% extends doctor %}
+
+
+
+{% block title %}Email Doctor{% endblock %}
+{% block content %}
+<head>
+<style>
+.margin_fix{
+	margin-top: 4%;
+}
+</style>
+<script>
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+function sameOrigin(url) {
+    // test that a given url is a same-origin URL
+    // url could be relative or scheme relative or absolute
+    var host = document.location.host; // host + port
+    var protocol = document.location.protocol;
+    var sr_origin = '//' + host;
+    var origin = protocol + sr_origin;
+    // Allow absolute or scheme relative URLs to same origin
+    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+        // or any other URL that isn't scheme relative or absolute i.e relative.
+        !(/^(\/\/|http:|https:).*/.test(url));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+            // Send the token to same-origin, relative URLs only.
+            // Send the token only if the method warrants CSRF protection
+            // Using the CSRFToken value acquired earlier
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+  function valid_input(input)
+  {
+    var check = parseInt(input)
+    if (isNaN(check))
+      return false;
+    else
+      return true;
+  }
+    // Sends a request to the database to add submitied data
+    function sendEmail()
+    {
+      	var Syear= $("input[name='Syear']").val();
+        var Smonth= $("input[name='Smonth']").val();
+        var Sday = $("input[name='Sday']").val();
+        var Eyear= $("input[name='Eyear']").val();
+        var Emonth = $("input[name='Emonth']").val();
+        var Eday = $("input[name='Eday']").val();
+
+        if (!(valid_input(Syear) && valid_input(Smonth) && valid_input(Sday) && valid_input(Eyear) && valid_input(Emonth) && valid_input(Eday)))
+         {
+         	   alert("You have entered an invalid input. Please only enter integers");
+    			return;
+         }
+
+
+        var checked = $("input[name='workout']:checked").size() + $("input[name='phys']:checked").size();
+
+        if (Syear == "" || Smonth == "" || Sday == "" || Eyear == "" || Emonth == "" || Eday == "" || checked == 0) { 
+            alert("Please fill out all of the fields");
+            return;
+        }
+        if(checked > 1)
+        {
+          alert("You may only view one type of summary at a time, Please check Workouts or Physiological");
+         return;
+        }
+        if(Syear.length != 4 || Eyear.length != 4)
+        {
+          alert("Incorrect formatting of year please try again, ex:  2014");
+          return;
+        }
+        if(Smonth.length != 2 || Emonth.length != 2 || Sday.length != 2 || Eday.length != 2)
+        {
+          alert("Incorrect formatting of month or day please try again, ex:  01");
+          return;
+        }	
+
+        var comments = $('#comments').val();
+
+        var type;
+
+        if($("input[name='workout']:checked").size() != 0)
+        	type = "workout";
+        else
+        	type = "phys";
+      
+        $.ajax({
+       type:"POST",
+       url:"/email_doc/",
+       data: {
+              'Syear': Syear, //for phys data
+              'Smonth': Smonth, // from form
+              'Sday': Sday, 
+              'Eyear': Eyear, //for phys data
+              'Emonth': Emonth, // from form
+              'Eday': Eday,
+              'type' : type,
+              'comments' : comments 
+              // all of this data is submitted via POST to your view.
+              // in django, request.POST['background-color'] 
+          },
+        success: function () {
+          alert("Your Doctor has been emailed")
+        },
+        error: function () {
+          alert("There was an issue adding your data. Please try again")}
+      });
+      }
+    
+
+</script>
+</head>
+<body>
+<h1 align="center">Email Your Doctor</h1>
+<h3>Please select the Date Range you would like to send data from to your doctor</h3>
+
+  <h4>Start Year:</h4>
+  <div class="form-group">
+    <label for="Syear" class="col-md-1 control-label" >Year</label>
+    <div class="col-md-2">
+     <input type="text" class="form-control" name="Syear" placeholder = "ex. 2014"></div>
+          <label for="Smonth" class="col-md-1 control-label">Month</label>
+    <div class="col-md-2">
+      <input type="text" class="form-control" name="Smonth" placeholder = "ex. 08"></div>
+          <label for="Sday" class="col-md-1 control-label">Day</label>
+    <div class="col-md-2">
+      <input type="text" class="form-control" name="Sday" placeholder = "ex. 01"></div>
+  </div><br/>
+    <h4>End Year:</h4>
+  <div class="form-group">
+    <label for="Eyear" class="col-md-1 control-label">Year</label>
+    <div class="col-md-2">
+     <input type="text" class="form-control" name="Eyear" placeholder = "ex. 2014"></div>
+          <label for="Emonth" class="col-md-1 control-label">Month</label>
+    <div class="col-md-2">
+      <input type="text" class="form-control" name="Emonth" placeholder = "ex. 09"></div>
+          <label for="Eday" class="col-md-1 control-label">Day</label>
+    <div class="col-md-2">
+      <input type="text" class="form-control" name="Eday" placeholder = "ex. 01"></div>
+  </div>
+  <div class="form-group">
+    <div class="col-md-12 margin_fix">
+      <div class="checkbox-inline margin_fix">
+        <label class = "col-md-6">
+          <input type="checkbox" name="workout"> Workouts
+        </label>
+        <label class="col-md-6"> <input type="checkbox" name="phys"> Physiological</label> 
+      </div>
+    </div>
+  </div>
+<div class="form-group">
+	   <label for="comments">Please Add any additional Comments</label>
+<textarea class="form-control" id="comments" rows="3"></textarea>
+</div>
+<buton class="btn btn-primary" onclick="sendEmail()">Send Email</button>
+</body>
+{% endblock %}

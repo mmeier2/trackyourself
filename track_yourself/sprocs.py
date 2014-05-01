@@ -9,24 +9,53 @@ class user_table():
     # Stored query to get the credentials users
     @staticmethod
     def get_user(email, password):
-        fname = lname = email_id = user_ID = None
+        fname = lname = email_id = user_ID = doctor = None
         cnx = mysql.connector.connect(user='root', database=DB_NAME)
         cursor = cnx.cursor()
-        get_user = ("SELECT userId, firstName, lastName, emailId FROM User WHERE emailid=%s AND password=%s")
+        get_user = ("SELECT userId, firstName, lastName, emailId, doctorFirstName FROM User WHERE emailid=%s AND password=%s")
         user_cred = (email, password)
         current_user.setEmail(email)
         try:
             cursor.execute(get_user, user_cred)
-            for (userId, firstName, lastName, emailId) in cursor:
+            #for (userId, firstName, lastName, emailId, doctorName) in cursor:
+            for (userId, firstName, lastName, emailId, doctorName) in cursor:
                     fname = firstName
                     lname = lastName
                     email_id = emailId
                     user_ID = userId
+                    if(doctorName):
+                        doctor = "user_doc.html"
+                    else:
+                        doctor = "user_nodoc.html"
+                    #doctor = "user_nodoc.html"
             cursor.close()
             cnx.close()
         except mysql.connector.Error as err:
+            print err
             pass
-        return {'user_ID':user_ID, 'fname':fname, 'lname':lname, 'email_id':email_id}
+        return {'user_ID':user_ID, 'fname':fname, 'lname':lname, 'email_id':email_id, 'doctor' : doctor}
+
+    @staticmethod
+    def get_doctor(user_data):
+        d_fname = d_lname = d_email = None
+        cnx = mysql.connector.connect(user='root', database=DB_NAME)
+        cursor = cnx.cursor()
+        get_user = ("SELECT doctorFirstName, doctorLastName, doctorEmail FROM User WHERE userId="+ str(user_data) )
+        try:
+            cursor.execute(get_user)
+            #for (userId, firstName, lastName, emailId, doctorName) in cursor:
+            for (doctorFirstName, doctorLastName, doctorEmail) in cursor:
+                    d_fname = doctorFirstName
+                    d_lname = doctorLastName
+                    d_email = doctorEmail
+            cursor.close()
+            cnx.close()
+        except mysql.connector.Error as err:
+            print err
+            pass
+        return {'fname':d_fname, 'lname':d_lname, 'email':d_email}
+
+
 
     # Method that creates and inserts a new user into the database
     @staticmethod
@@ -62,6 +91,23 @@ class user_table():
         except mysql.connector.Error as err:
             return False
 
+
+    @staticmethod
+    def add_doctor(data_data):
+        add_data = ("UPDATE User SET doctorFirstName = %s, doctorLastName = %s, doctorEmail = %s WHERE userId = %s")
+        cnx = mysql.connector.connect(user='root', database=DB_NAME)
+        cursor = cnx.cursor()
+        print add_data
+        print data_data
+        try:
+            cursor.execute(add_data, data_data)
+            cnx.commit()
+            cursor.close()
+            cnx.close()
+            return True
+        except mysql.connector.Error as err:
+            return False
+
 # Class that provides simple methods for getting data from the data database
 class data_table():
     # Method to retreive any type of data between a set time period in the data database
@@ -71,8 +117,6 @@ class data_table():
         cursor = cnx.cursor()
         get_data = ("SELECT date, duration, descriptionType FROM Data WHERE date >= %s AND date <= %s AND dataType=%s AND userId=%s")
         interval = (start, end, data_type, user_ID)
-        print get_data
-        print interval
         try:
             dates = []
             durations = []
@@ -84,7 +128,6 @@ class data_table():
             cursor.execute(get_data, interval)
             for (date, duration, descriptionType) in cursor:
                 if date is not None and duration is not None and descriptionType is not None:
-                    print date
                     dates.append(date)
                     durations.append(duration)
                     descriptions.append(descriptionType)

@@ -19,7 +19,7 @@ current_user = User('','','','',[],[])
 # route a user depending on whether or not they are logged in
 def home(request):
     if 'member_id' in request.session:
-        return render(request, 'user_home.html')
+        return render_to_response('user_home.html', {"doctor" : request.session['doctor']})
     else:
         current_user.setFirstName('')
         current_user.setLastName('')
@@ -34,8 +34,9 @@ def invalid_login(request):
 
 # Route logged in user to logged in home page
 def user_home(request):
+    print "jere"
     if 'member_id' in request.session:
-        return render(request, 'user_home.html')
+        return render_to_response('user_home.html', {"doctor" : request.session['doctor']})
     else:
         return render(request, 'bare.html')
 
@@ -43,6 +44,8 @@ def user_home(request):
 def logout(request):
     if 'member_id' in request.session:
         del request.session['member_id']
+        if 'doctor' in request.session:
+            del request.session['doctor']
         current_user.setFirstName('')
         current_user.setLastName('')
         current_user.setEmail('')
@@ -57,8 +60,11 @@ def login_auth(request):
         user_cred = user_table.get_user(email, password)
         if user_cred['fname'] is not None:
             request.session['member_id'] = user_cred['user_ID']
+            request.session['doctor'] = user_cred['doctor']
+            if('doctor' not in request.session):
+                request.session['doctor'] = "user_nodoc.html"
             current_user.setEmail(email)
-            return redirect('/user_home/')
+            return render_to_response('user_home.html', {"doctor" : request.session['doctor']})
         else:
             return redirect('/invalid_login/')
 
@@ -81,7 +87,8 @@ def register_auth(request):
         user_cred = user_table.get_user(email, password)
         if user_was_added:
             request.session['member_id'] = user_cred['user_ID']
-            return redirect('/user_home/')
+            request.session['doctor'] = "user_nodoc.html"
+            return render_to_response('user_home.html', {"doctor" : request.session['doctor']})
     else:
         return redirect('home')
 
@@ -108,21 +115,22 @@ def register(request):
 # If a user is logged in, send them to the log phys data page
 def log_phys_data(request):
     if 'member_id' in request.session:
-        return render(request, 'log_phys_data.html')
+        return render_to_response('log_phys_data.html', {"doctor" : request.session['doctor']})
     else:
         return redirect('/')
 
 # If a user is logged in, route them to the log a workout page
 def log_workout(request):
     if 'member_id' in request.session:
-       return render(request, 'log_workout.html')
+        return render_to_response('log_workout.html', {"doctor" : request.session['doctor']})
     else:
         return redirect('/')
 
 # If a user is logged in, send them to the view summary page
 def view_summary(request):
+    request.csrf_processing_done = True
     if 'member_id' in request.session:
-       return render(request, 'view_summary.html')
+        return render_to_response('view_summary.html', {"doctor" : request.session['doctor']})
     else:
         return redirect('/')
 
@@ -135,6 +143,7 @@ def access_denied(request):
         return redirect('/')
 
 # Depending on the dype of summary the user wants to see, send them to the appropriate router
+@csrf_exempt
 def view_data_summary(request):
     if( str(request.POST.get('phys')) == 'on'):
         return view_phys_summary(request)
@@ -159,7 +168,7 @@ def view_phys_summary(request):
     
     print dates
 
-    return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Phys', 'postData' : {"s_time": start, "e_time" : end, "sTime" : s_time, "eTime" : e_time}})
+    return render_to_response('summary.html', {'doctor': request.session['doctor'], 'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Phys', 'postData' : {"s_time": start, "e_time" : end, "sTime" : s_time, "eTime" : e_time}})
 
 def view_workout_summary(request):
     s_time = str(request.POST.get('Syear')) + '-'
@@ -177,7 +186,7 @@ def view_workout_summary(request):
     end = str(request.POST.get('Emonth')) + '/' + str(request.POST.get('Eday')) + '/' + str(request.POST.get('Eyear'))
     print dates
 
-    return render_to_response('summary.html', {'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Workout', 'postData' : {"s_time": start, "e_time" : end, "sTime" : s_time, "eTime" : e_time}})
+    return render_to_response('summary.html', {'doctor':request.session['doctor'], 'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Workout', 'postData' : {"s_time": start, "e_time" : end, "sTime" : s_time, "eTime" : e_time}})
 
 # This funciton creates a csv out of the data in the summary being viewed by the user
 @csrf_exempt
@@ -211,3 +220,42 @@ def create_csv(request):
                 description = Phys[int(description)]
             writer.writerow([date, description, duration]) 
         return response
+
+def add_doctor(request):
+    if request.POST:
+        d_fName = request.POST['fName']
+        d_lName = request.POST['lName']
+        d_email = request.POST['email']
+        data_data = (d_fName, d_lName, d_email, request.session['member_id'])
+        data_was_added = user_table.add_doctor(data_data)
+        if data_was_added:
+            request.session['doctor'] = "user_doc.html"
+            return redirect('/')
+        else:
+            return HttpResponse(status=500)
+    else:
+        return render_to_response("add_doctor.html", {'doctor': request.session['doctor']})
+
+def email_doc(request):
+    if request.POST:
+        s_time = str(request.POST.get('Syear')) + '-'
+        s_time = s_time + str(request.POST.get('Smonth')) + '-'
+        s_time = s_time + str(request.POST.get('Sday')) + " 00:00:00" 
+        e_time = str(request.POST.get('Eyear')) + '-'
+        e_time = e_time + str(request.POST.get('Emonth')) + '-'
+        e_time = e_time + str(request.POST.get('Eday')) + " 23:59:59"
+        if(request.POST['type'] == "workout"):
+            data_type = 0
+            data = "Workout"
+        else:
+            data_type = 1
+            data = "Physiological"
+        user_ID = request.session['member_id'] 
+        phys_data = data_table.get_data_summary_between(s_time, e_time, data_type, user_ID)
+        dates = phys_data[0]
+        durations = phys_data[1]
+        descriptions = phys_data[2]
+        comments = request.POST['comments']
+        doctor_info = user_table.get_doctor(user_ID)
+    else:
+        return render_to_response("email_doc.html", {'doctor': request.session['doctor']})
