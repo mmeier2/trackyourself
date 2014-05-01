@@ -9,6 +9,13 @@ from django.template import Template
 from sprocs import user_table, data_table
 from django.views.decorators.csrf import csrf_exempt
 from classes import Data, PhysData, WorkoutData, User, Month, Date_Obj
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
+from email.MIMEImage import MIMEImage
+import smtplib
+from django.core.mail import send_mail, EmailMessage
+import StringIO
+
 
 # set the database name for connection
 DB_NAME = 'SE_Database_Schema'
@@ -244,12 +251,18 @@ def email_doc(request):
         e_time = str(request.POST.get('Eyear')) + '-'
         e_time = e_time + str(request.POST.get('Emonth')) + '-'
         e_time = e_time + str(request.POST.get('Eday')) + " 23:59:59"
+        
+        Phys = ["Heartrate", "Fat Percentage", "Weight"]
+        Work = ["Running", "Weight Lifting", "Swimming"]
         if(request.POST['type'] == "workout"):
             data_type = 0
             data = "Workout"
+            types = Work
         else:
             data_type = 1
             data = "Physiological"
+            types = Phys
+        
         user_ID = request.session['member_id'] 
         phys_data = data_table.get_data_summary_between(s_time, e_time, data_type, user_ID)
         dates = phys_data[0]
@@ -257,5 +270,26 @@ def email_doc(request):
         descriptions = phys_data[2]
         comments = request.POST['comments']
         doctor_info = user_table.get_doctor(user_ID)
+        
+        csvfile=StringIO.StringIO()
+        csvwriter =csv.writer(csvfile)
+        csvwriter.writerow(['Date', 'Description Type', 'Measurement'])
+        for date, duration, descrip in zip(dates, durations, descriptions):
+            csvwriter.writerow([date, types[descrip], duration])
+
+        recipient  = doctor_info['email']
+        email_subject = "Health Tracker Data"
+        content = "Hi Dr. %s, \n "
+        body_of_email = "Hi Dr. %s, \n \n" % (doctor_info['lname'])
+        body_of_email += comments
+
+        message = EmailMessage(email_subject, body_of_email, 'trackyourselfCSE360@gmail.com',[recipient])
+
+        message.attach('invoice.csv', csvfile.getvalue(), 'text/csv')
+        message.send()
+        
+        return HttpResponse(status=200)
+
     else:
         return render_to_response("email_doc.html", {'doctor': request.session['doctor']})
+
