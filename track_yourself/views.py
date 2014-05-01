@@ -145,49 +145,55 @@ def access_denied(request):
 # Depending on the dype of summary the user wants to see, send them to the appropriate router
 @csrf_exempt
 def view_data_summary(request):
-    if( str(request.POST.get('phys')) == 'on'):
-        return view_phys_summary(request)
-    elif( str(request.POST.get('workout')) == 'on'):
-        return view_workout_summary(request)
+    if 'member_id' in request.session:
+        if( str(request.POST.get('phys')) == 'on'):
+            return view_phys_summary(request)
+        elif( str(request.POST.get('workout')) == 'on'):
+            return view_workout_summary(request)
+    else:
+        return redirect('/')
 
 # Query the database for the data requested by the user for physical data
 def view_phys_summary(request):
-    s_time = str(request.POST.get('Syear')) + '-'
-    s_time = s_time + str(request.POST.get('Smonth')) + '-'
-    s_time = s_time + str(request.POST.get('Sday')) + " 00:00:00" 
-    e_time = str(request.POST.get('Eyear')) + '-'
-    e_time = e_time + str(request.POST.get('Emonth')) + '-'
-    e_time = e_time + str(request.POST.get('Eday')) + " 23:59:59"
-    user_ID = request.session['member_id'] 
-    phys_data = data_table.get_data_summary_between(s_time, e_time, 1, user_ID)
-    dates = phys_data[0]
-    durations = phys_data[1]
-    descriptions = phys_data[2]
-    start = str(request.POST.get('Smonth')) + '/' + str(request.POST.get('Sday')) + '/' + str(request.POST.get('Syear'))
-    end = str(request.POST.get('Emonth')) + '/' + str(request.POST.get('Eday')) + '/' + str(request.POST.get('Eyear'))
-    
-    print dates
-
-    return render_to_response('summary.html', {'doctor': request.session['doctor'], 'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Phys', 'postData' : {"s_time": start, "e_time" : end, "sTime" : s_time, "eTime" : e_time}})
+    if 'member_id' in request.session:
+        s_time = str(request.POST.get('Syear')) + '-'
+        s_time = s_time + str(request.POST.get('Smonth')) + '-'
+        s_time = s_time + str(request.POST.get('Sday')) + " 00:00:00" 
+        e_time = str(request.POST.get('Eyear')) + '-'
+        e_time = e_time + str(request.POST.get('Emonth')) + '-'
+        e_time = e_time + str(request.POST.get('Eday')) + " 23:59:59"
+        user_ID = request.session['member_id'] 
+        phys_data = data_table.get_data_summary_between(s_time, e_time, 1, user_ID)
+        dates = phys_data[0]
+        durations = phys_data[1]
+        descriptions = phys_data[2]
+        start = str(request.POST.get('Smonth')) + '/' + str(request.POST.get('Sday')) + '/' + str(request.POST.get('Syear'))
+        end = str(request.POST.get('Emonth')) + '/' + str(request.POST.get('Eday')) + '/' + str(request.POST.get('Eyear'))
+        
+        return render_to_response('summary.html', {'doctor': request.session['doctor'], 'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Phys', 'postData' : {"s_time": start, "e_time" : end, "sTime" : s_time, "eTime" : e_time}})
+    else:
+        return redirect('/')
 
 def view_workout_summary(request):
-    s_time = str(request.POST.get('Syear')) + '-'
-    s_time = s_time + str(request.POST.get('Smonth')) + '-'
-    s_time = s_time + str(request.POST.get('Sday')) + " 00:00:00" 
-    e_time = str(request.POST.get('Eyear')) + '-'
-    e_time = e_time + str(request.POST.get('Emonth')) + '-'
-    e_time = e_time + str(request.POST.get('Eday')) + " 23:59:59"
-    user_ID = request.session['member_id'] 
-    phys_data = data_table.get_data_summary_between(s_time, e_time, 0, user_ID)
-    dates = phys_data[0]
-    durations = phys_data[1]
-    descriptions = phys_data[2]
-    start = str(request.POST.get('Smonth')) + '/' + str(request.POST.get('Sday')) + '/' + str(request.POST.get('Syear'))
-    end = str(request.POST.get('Emonth')) + '/' + str(request.POST.get('Eday')) + '/' + str(request.POST.get('Eyear'))
-    print dates
+    if 'member_id' in request.session:
+        s_time = str(request.POST.get('Syear')) + '-'
+        s_time = s_time + str(request.POST.get('Smonth')) + '-'
+        s_time = s_time + str(request.POST.get('Sday')) + " 00:00:00" 
+        e_time = str(request.POST.get('Eyear')) + '-'
+        e_time = e_time + str(request.POST.get('Emonth')) + '-'
+        e_time = e_time + str(request.POST.get('Eday')) + " 23:59:59"
+        user_ID = request.session['member_id'] 
+        phys_data = data_table.get_data_summary_between(s_time, e_time, 0, user_ID)
+        dates = phys_data[0]
+        durations = phys_data[1]
+        descriptions = phys_data[2]
+        start = str(request.POST.get('Smonth')) + '/' + str(request.POST.get('Sday')) + '/' + str(request.POST.get('Syear'))
+        end = str(request.POST.get('Emonth')) + '/' + str(request.POST.get('Eday')) + '/' + str(request.POST.get('Eyear'))
 
-    return render_to_response('summary.html', {'doctor':request.session['doctor'], 'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Workout', 'postData' : {"s_time": start, "e_time" : end, "sTime" : s_time, "eTime" : e_time}})
+        return render_to_response('summary.html', {'doctor':request.session['doctor'], 'dates': dates , 'durations' : durations , 'descriptions' : descriptions , 'type' : 'Workout', 'postData' : {"s_time": start, "e_time" : end, "sTime" : s_time, "eTime" : e_time}})
 
+    else:
+        return redirect('/')
 # This funciton creates a csv out of the data in the summary being viewed by the user
 @csrf_exempt
 def create_csv(request):  
@@ -222,20 +228,23 @@ def create_csv(request):
         return response
 
 def add_doctor(request):
-    if request.POST:
-        d_fName = request.POST['fName']
-        d_lName = request.POST['lName']
-        d_email = request.POST['email']
-        data_data = (d_fName, d_lName, d_email, request.session['member_id'])
-        data_was_added = user_table.add_doctor(data_data)
-        if data_was_added:
-            request.session['doctor'] = "user_doc.html"
-            return redirect('/')
+    if 'member_id' in request.session:
+        if request.POST:
+            d_fName = request.POST['fName']
+            d_lName = request.POST['lName']
+            d_email = request.POST['email']
+            data_data = (d_fName, d_lName, d_email, request.session['member_id'])
+            data_was_added = user_table.add_doctor(data_data)
+            if data_was_added:
+                request.session['doctor'] = "user_doc.html"
+                return redirect('/')
+            else:
+                return HttpResponse(status=500)
         else:
-            return HttpResponse(status=500)
-    else:
-        return render_to_response("add_doctor.html", {'doctor': request.session['doctor']})
+            return render_to_response("add_doctor.html", {'doctor': request.session['doctor']})
 
+    else:
+        return redirect('/')
 def email_doc(request):
     if request.POST:
         s_time = str(request.POST.get('Syear')) + '-'

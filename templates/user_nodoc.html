@@ -20,7 +20,28 @@
     </style>
     <script src="{% static 'bare/js/jquery-1.10.2.js' %}"></script>
     <script src="{% static 'bare/js/bootstrap.js' %}"></script>
+ <script>
+      var inactivityTime = function () {
+    var t;
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
 
+    function logout() {
+        alert("Due to inactivity on the site, you are now logged out.")
+        location.href = '/logout/'
+    }
+
+    function resetTimer() {
+        clearTimeout(t);
+        t = setTimeout(logout, 60000)
+        // 1000 milisec = 1 sec
+    }
+};
+    $(document).ready(inactivityTime());
+
+    
+    </script>
   </head>
 
   <body>
